@@ -1,6 +1,13 @@
 import express from 'express';
-import cors from 'cors';
+
 import { categories, toolsByCategory } from './data/tools.js';
+import cors from "cors";
+
+app.use(cors({
+  origin: "solutionsclient-git-main-adarshs-projects-e60bb8e5.vercel.app",
+  credentials: true
+}));
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
