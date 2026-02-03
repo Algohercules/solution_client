@@ -1,5 +1,8 @@
 # 100xSolutions Education
 
+https://solutionsclient.vercel.app
+
+
 A curated directory of AI tools across **Video**, **Audio**, **Image**, and **Chatbots** — built with the MERN stack (MongoDB-ready Express + React + Node).
 
 ## Features
