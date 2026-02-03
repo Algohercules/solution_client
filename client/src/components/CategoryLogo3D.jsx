@@ -11,7 +11,7 @@ const mat = (color, emissive = '#000000', emissiveIntensity = 0) => ({
   emissiveIntensity,
 });
 
-// ——— VIDEO: Clapperboard (film slate) ———
+// ——— VIDEO: StarryAI-style creation frame (cinematic frame + play) ———
 function VideoLogo() {
   const group = useRef(null);
   useFrame((state) => {
@@ -22,123 +22,166 @@ function VideoLogo() {
   });
   return (
     <group ref={group} scale={1.15}>
-      <RoundedBox args={[0.5, 0.32, 0.06]} radius={0.02} position={[0, 0, 0]}>
-        <meshStandardMaterial {...mat('#1e293b')} />
+      <RoundedBox args={[0.48, 0.3, 0.08]} radius={0.03} position={[0, 0, 0]}>
+        <meshStandardMaterial {...mat('#0f172a')} metalness={0.4} roughness={0.4} />
       </RoundedBox>
-      <RoundedBox args={[0.22, 0.12, 0.07]} radius={0.015} position={[0.12, 0.08, 0.04]}>
-        <meshStandardMaterial {...mat('#334155')} />
-      </RoundedBox>
-      <mesh position={[0, 0, 0.035]}>
-        <circleGeometry args={[0.04, 16]} />
-        <meshStandardMaterial {...mat('#3b82f6', '#3b82f6', 0.2)} />
+      <mesh position={[0, 0, 0.045]}>
+        <planeGeometry args={[0.36, 0.22]} />
+        <meshStandardMaterial {...mat('#1e293b')} side={THREE.DoubleSide} />
       </mesh>
+      <mesh position={[0, 0, 0.05]}>
+        <coneGeometry args={[0.06, 0.08, 3]} />
+        <meshStandardMaterial {...mat('#3b82f6', '#3b82f6', 0.4)} />
+      </mesh>
+      <RoundedBox args={[0.44, 0.02, 0.02]} radius={0.01} position={[0, 0.16, 0.05]}>
+        <meshStandardMaterial {...mat('#3b82f6', '#3b82f6', 0.25)} />
+      </RoundedBox>
+      <RoundedBox args={[0.44, 0.02, 0.02]} radius={0.01} position={[0, -0.16, 0.05]}>
+        <meshStandardMaterial {...mat('#3b82f6', '#3b82f6', 0.25)} />
+      </RoundedBox>
     </group>
   );
 }
 
-// ——— AUDIO: Microphone ———
+// ——— AUDIO: OpenAI-style waveform / sound waves ———
 function AudioLogo() {
   const group = useRef(null);
+  const waves = useRef([]);
+  const heights = [0.12, 0.2, 0.28, 0.22, 0.18, 0.24, 0.16];
   useFrame((state) => {
-    if (!group.current) return;
     const t = state.clock.elapsedTime;
-    group.current.rotation.y = t * 0.4;
-    group.current.position.y = Math.sin(t * 1.2) * 0.025;
-  });
-  return (
-    <group ref={group} scale={1.1}>
-      <mesh position={[0, 0, -0.12]}>
-        <cylinderGeometry args={[0.12, 0.14, 0.04, 24]} />
-        <meshStandardMaterial {...mat('#0f172a')} />
-      </mesh>
-      <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.025, 0.025, 0.2, 16]} />
-        <meshStandardMaterial {...mat('#06b6d4')} metalness={0.5} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, 0, 0.14]}>
-        <sphereGeometry args={[0.06, 24, 24]} />
-        <meshStandardMaterial {...mat('#22d3ee', '#22d3ee', 0.15)} metalness={0.4} roughness={0.35} />
-      </mesh>
-    </group>
-  );
-}
-
-// ——— IMAGE: Camera ———
-function ImageLogo() {
-  const group = useRef(null);
-  useFrame((state) => {
-    if (!group.current) return;
-    const t = state.clock.elapsedTime;
-    group.current.rotation.y = t * 0.45;
-    group.current.position.y = Math.sin(t * 0.7) * 0.02;
-  });
-  return (
-    <group ref={group} scale={1.1}>
-      <RoundedBox args={[0.4, 0.28, 0.2]} radius={0.03} position={[0, 0, -0.02]}>
-        <meshStandardMaterial {...mat('#4c1d95')} metalness={0.3} roughness={0.5} />
-      </RoundedBox>
-      <mesh position={[0, 0, 0.08]}>
-        <cylinderGeometry args={[0.08, 0.09, 0.06, 32]} />
-        <meshStandardMaterial {...mat('#1e293b')} metalness={0.6} roughness={0.25} />
-      </mesh>
-      <mesh position={[0, 0, 0.12]}>
-        <circleGeometry args={[0.055, 32]} />
-        <meshStandardMaterial {...mat('#7c3aed', '#7c3aed', 0.1)} />
-      </mesh>
-      <RoundedBox args={[0.12, 0.06, 0.04]} radius={0.01} position={[0.14, 0.1, -0.02]}>
-        <meshStandardMaterial {...mat('#5b21b6')} />
-      </RoundedBox>
-    </group>
-  );
-}
-
-// ——— CHATBOT: Speech bubble ———
-function ChatbotLogo() {
-  const group = useRef(null);
-  useFrame((state) => {
-    if (!group.current) return;
-    const t = state.clock.elapsedTime;
-    group.current.position.y = Math.sin(t * 1) * 0.03;
-    group.current.scale.setScalar(1 + Math.sin(t * 2) * 0.04);
+    if (group.current) {
+      group.current.rotation.y = t * 0.4;
+      group.current.position.y = Math.sin(t * 1.2) * 0.025;
+    }
+    waves.current.forEach((mesh, i) => {
+      if (mesh) {
+        const scale = 0.85 + 0.3 * Math.sin(t * 2.5 + i * 0.8);
+        mesh.scale.y = scale;
+      }
+    });
   });
   return (
     <group ref={group} scale={1.05}>
-      <RoundedBox args={[0.42, 0.3, 0.12]} radius={0.04} position={[0, 0.02, 0]}>
-        <meshStandardMaterial {...mat('#2563eb', '#3b82f6', 0.12)} metalness={0.2} roughness={0.5} />
+      <RoundedBox args={[0.4, 0.06, 0.06]} radius={0.02} position={[0, -0.18, 0]}>
+        <meshStandardMaterial {...mat('#0f172a')} />
       </RoundedBox>
-      <RoundedBox args={[0.14, 0.1, 0.08]} radius={0.02} position={[-0.12, -0.14, 0.02]} rotation={[0, 0, 0.2]}>
-        <meshStandardMaterial {...mat('#2563eb', '#3b82f6', 0.12)} metalness={0.2} roughness={0.5} />
-      </RoundedBox>
+      {heights.map((h, i) => (
+        <mesh
+          key={i}
+          ref={(el) => (waves.current[i] = el)}
+          position={[-0.18 + i * 0.06, -0.18 + h / 2, 0]}
+          scale={[1, 1, 1]}
+        >
+          <RoundedBox args={[0.04, h, 0.04]} radius={0.015} />
+          <meshStandardMaterial {...mat('#06b6d4', '#22d3ee', 0.35)} metalness={0.3} roughness={0.4} />
+        </mesh>
+      ))}
     </group>
   );
 }
 
-// ——— TEXT/WRITING: Open book ———
-function TextWritingLogo() {
-  const leftPage = useRef(null);
-  const rightPage = useRef(null);
+// ——— IMAGE: Neon spectrum C + paint splash (pngtree style) ———
+function ImageLogo() {
+  const group = useRef(null);
+  const splash = useRef(null);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    const open = 0.5 + Math.sin(t * 0.6) * 0.15;
-    if (leftPage.current) leftPage.current.rotation.y = open;
-    if (rightPage.current) rightPage.current.rotation.y = -open;
+    if (group.current) {
+      group.current.rotation.y = t * 0.45;
+      group.current.position.y = Math.sin(t * 0.7) * 0.02;
+    }
+    if (splash.current) splash.current.scale.setScalar(1 + Math.sin(t * 1.5) * 0.08);
+  });
+  const torusRadius = 0.2;
+  const tubeRadius = 0.055;
+  return (
+    <group ref={group} scale={1.1}>
+      <mesh position={[0.08, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <torusGeometry args={[torusRadius, tubeRadius, 16, 32, Math.PI]} />
+        <meshStandardMaterial
+          {...mat('#8b5cf6', '#a78bfa', 0.4)}
+          metalness={0.2}
+          roughness={0.35}
+        />
+      </mesh>
+      <mesh ref={splash} position={[-0.12, -0.08, 0.02]}>
+        <sphereGeometry args={[0.14, 12, 12]} />
+        <meshStandardMaterial
+          {...mat('#c084fc', '#e879f9', 0.25)}
+          metalness={0.15}
+          roughness={0.5}
+        />
+      </mesh>
+      <mesh position={[-0.05, -0.12, 0]}>
+        <sphereGeometry args={[0.06, 12, 12]} />
+        <meshStandardMaterial {...mat('#38bdf8', '#38bdf8', 0.3)} />
+      </mesh>
+    </group>
+  );
+}
+
+// ——— CHATBOT: OpenAI-style conversation (two bubbles) ———
+function ChatbotLogo() {
+  const group = useRef(null);
+  const left = useRef(null);
+  const right = useRef(null);
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (group.current) group.current.position.y = Math.sin(t * 1) * 0.03;
+    if (left.current) left.current.scale.setScalar(1 + Math.sin(t * 2) * 0.05);
+    if (right.current) right.current.scale.setScalar(1 + Math.sin(t * 2 + 0.5) * 0.05);
   });
   return (
-    <group scale={1.1}>
-      <group ref={leftPage} position={[-0.08, 0, 0]}>
-        <RoundedBox args={[0.2, 0.28, 0.03]} radius={0.01} position={[0, 0, 0]}>
-          <meshStandardMaterial {...mat('#f8fafc')} roughness={0.6} />
+    <group ref={group} scale={1.05}>
+      <group ref={left}>
+        <RoundedBox args={[0.32, 0.22, 0.1]} radius={0.04} position={[-0.1, 0.06, 0]}>
+          <meshStandardMaterial {...mat('#1e40af', '#3b82f6', 0.2)} metalness={0.2} roughness={0.5} />
+        </RoundedBox>
+        <RoundedBox args={[0.1, 0.08, 0.06]} radius={0.02} position={[-0.18, -0.06, 0.02]} rotation={[0, 0, 0.15]}>
+          <meshStandardMaterial {...mat('#1e40af', '#3b82f6', 0.2)} />
         </RoundedBox>
       </group>
-      <group ref={rightPage} position={[0.08, 0, 0]}>
-        <RoundedBox args={[0.2, 0.28, 0.03]} radius={0.01} position={[0, 0, 0]}>
-          <meshStandardMaterial {...mat('#f8fafc')} roughness={0.6} />
+      <group ref={right}>
+        <RoundedBox args={[0.28, 0.18, 0.1]} radius={0.035} position={[0.12, -0.06, 0]}>
+          <meshStandardMaterial {...mat('#3b82f6', '#60a5fa', 0.15)} metalness={0.2} roughness={0.5} />
+        </RoundedBox>
+        <RoundedBox args={[0.08, 0.06, 0.06]} radius={0.015} position={[0.18, -0.12, 0.02]} rotation={[0, 0, -0.2]}>
+          <meshStandardMaterial {...mat('#3b82f6', '#60a5fa', 0.15)} />
         </RoundedBox>
       </group>
-      <mesh position={[0, 0, -0.02]}>
-        <boxGeometry args={[0.04, 0.28, 0.04]} />
-        <meshStandardMaterial {...mat('#06b6d4')} />
-      </mesh>
+    </group>
+  );
+}
+
+// ——— TEXT/WRITING: Iconscout-style pen + document ———
+function TextWritingLogo() {
+  const group = useRef(null);
+  const pen = useRef(null);
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (group.current) group.current.rotation.y = t * 0.35;
+    if (pen.current) pen.current.rotation.z = 0.15 + Math.sin(t * 0.8) * 0.05;
+  });
+  return (
+    <group ref={group} scale={1.1}>
+      <RoundedBox args={[0.38, 0.26, 0.04]} radius={0.02} position={[0, -0.02, -0.02]}>
+        <meshStandardMaterial {...mat('#f1f5f9')} roughness={0.6} />
+      </RoundedBox>
+      <group ref={pen} position={[0.08, 0.08, 0.02]} rotation={[0, 0, 0.15]}>
+        <mesh position={[0, 0, 0]}>
+          <cylinderGeometry args={[0.012, 0.012, 0.22, 12]} />
+          <meshStandardMaterial {...mat('#0f172a')} metalness={0.5} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.12, 0]}>
+          <coneGeometry args={[0.018, 0.04, 12]} />
+          <meshStandardMaterial {...mat('#64748b')} />
+        </mesh>
+        <mesh position={[0, -0.11, 0]}>
+          <cylinderGeometry args={[0.014, 0.016, 0.03, 12]} />
+          <meshStandardMaterial {...mat('#06b6d4', '#22d3ee', 0.2)} />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -183,66 +226,91 @@ function AgenticLogo() {
   );
 }
 
-// ——— DATA/ANALYTICS: Bar chart with growing bars ———
+// ——— DATA/ANALYTICS: Geo/data viz (globe + data points) ———
 function DataAnalyticsLogo() {
   const group = useRef(null);
-  const bars = [0.18, 0.28, 0.22, 0.32, 0.24];
-  const refs = useRef([]);
+  const points = useRef([]);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    if (group.current) group.current.rotation.y = t * 0.35;
-    refs.current.forEach((mesh, i) => {
+    if (group.current) group.current.rotation.y = t * 0.4;
+    points.current.forEach((mesh, i) => {
       if (mesh) {
-        const phase = (t * 1.5 + i * 0.4) % (Math.PI * 2);
-        mesh.scale.y = 0.5 + 0.5 * (0.7 + 0.3 * Math.sin(phase));
+        const pulse = 1 + Math.sin(t * 2 + i) * 0.15;
+        mesh.scale.setScalar(pulse);
       }
     });
   });
+  const pts = [[0.12, 0.08], [-0.1, 0.12], [0.08, -0.1], [-0.12, -0.06], [0.14, -0.12]];
   return (
     <group ref={group} scale={1.05}>
-      <RoundedBox args={[0.45, 0.04, 0.12]} radius={0.02} position={[0, -0.18, 0]}>
-        <meshStandardMaterial {...mat('#1e293b')} />
-      </RoundedBox>
-      {bars.map((h, i) => (
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.22, 20, 20]} />
+        <meshStandardMaterial {...mat('#0f172a')} metalness={0.2} roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 0, 0]}>
+        <ringGeometry args={[0.2, 0.22, 32]} />
+        <meshStandardMaterial {...mat('#1e293b')} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.2, 0.22, 32]} />
+        <meshStandardMaterial {...mat('#1e293b')} side={THREE.DoubleSide} />
+      </mesh>
+      {pts.map(([x, y], i) => (
         <mesh
           key={i}
-          ref={(el) => (refs.current[i] = el)}
-          position={[-0.18 + i * 0.09, -0.18 + h / 2, 0]}
-          scale={[1, 1, 1]}
+          ref={(el) => (points.current[i] = el)}
+          position={[x, y, 0.23 + i * 0.01]}
         >
-          <cylinderGeometry args={[0.03, 0.03, h, 12]} />
-          <meshStandardMaterial {...mat(i % 2 === 0 ? '#3b82f6' : '#06b6d4', '#3b82f6', 0.1)} metalness={0.3} roughness={0.45} />
+          <sphereGeometry args={[0.04, 12, 12]} />
+          <meshStandardMaterial {...mat(i % 2 === 0 ? '#3b82f6' : '#06b6d4', '#3b82f6', 0.4)} />
         </mesh>
       ))}
     </group>
   );
 }
 
-// ——— DEVELOPER: Code brackets </> ———
+// ——— DEVELOPER: VividQ-style holographic/code layers ———
 function DeveloperLogo() {
   const group = useRef(null);
+  const layers = useRef([]);
   useFrame((state) => {
-    if (!group.current) return;
     const t = state.clock.elapsedTime;
-    group.current.rotation.y = t * 0.45;
-    group.current.position.y = Math.sin(t * 0.7) * 0.02;
+    if (group.current) {
+      group.current.rotation.y = t * 0.45;
+      group.current.position.y = Math.sin(t * 0.7) * 0.02;
+    }
+    layers.current.forEach((mesh, i) => {
+      if (mesh) mesh.rotation.z = t * 0.2 + i * 0.3;
+    });
   });
+  const layerOffsets = [0, 0.04, 0.08];
   return (
-    <group ref={group} scale={1.1}>
-      <RoundedBox args={[0.08, 0.28, 0.06]} radius={0.02} position={[-0.12, 0, 0.05]} rotation={[0, 0, 0.4]}>
-        <meshStandardMaterial {...mat('#22c55e', '#22c55e', 0.15)} />
-      </RoundedBox>
-      <RoundedBox args={[0.06, 0.12, 0.05]} radius={0.015} position={[0, 0.06, 0.05]}>
-        <meshStandardMaterial {...mat('#22c55e', '#22c55e', 0.15)} />
-      </RoundedBox>
-      <RoundedBox args={[0.08, 0.28, 0.06]} radius={0.02} position={[0.12, 0, 0.05]} rotation={[0, 0, -0.4]}>
-        <meshStandardMaterial {...mat('#22c55e', '#22c55e', 0.15)} />
-      </RoundedBox>
+    <group ref={group} scale={1.05}>
+      {layerOffsets.map((z, i) => (
+        <mesh
+          key={i}
+          ref={(el) => (layers.current[i] = el)}
+          position={[0, 0, -0.06 + z]}
+          rotation={[0, 0, (i * Math.PI) / 3]}
+        >
+          <planeGeometry args={[0.36, 0.36]} />
+          <meshStandardMaterial
+            {...mat('#22c55e', '#4ade80', 0.2 + i * 0.1)}
+            transparent
+            opacity={0.85 - i * 0.2}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ))}
+      <mesh position={[0, 0, 0.02]}>
+        <boxGeometry args={[0.12, 0.12, 0.04]} />
+        <meshStandardMaterial {...mat('#16a34a', '#22c55e', 0.35)} />
+      </mesh>
     </group>
   );
 }
 
-// ——— SPECIALIZED: Industry badge (hexagon + star) ———
+// ——— SPECIALIZED: Toffu-style mid-poly industrial building ———
 function SpecializedLogo() {
   const group = useRef(null);
   useFrame((state) => {
@@ -250,53 +318,64 @@ function SpecializedLogo() {
     const t = state.clock.elapsedTime;
     group.current.rotation.y = t * 0.4;
     group.current.position.y = Math.sin(t * 0.9) * 0.025;
-    group.current.scale.setScalar(1 + Math.sin(t * 1.5) * 0.03);
   });
   return (
     <group ref={group} scale={1.05}>
-      <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 6]}>
-        <cylinderGeometry args={[0.3, 0.32, 0.06, 6]} />
-        <meshStandardMaterial {...mat('#b91c1c', '#ef4444', 0.08)} metalness={0.4} roughness={0.45} />
-      </mesh>
-      <RoundedBox args={[0.12, 0.2, 0.04]} radius={0.02} position={[0, 0.18, 0.02]}>
-        <meshStandardMaterial {...mat('#f87171', '#f87171', 0.2)} />
+      <RoundedBox args={[0.28, 0.12, 0.2]} radius={0.02} position={[0, -0.1, 0]}>
+        <meshStandardMaterial {...mat('#334155')} metalness={0.3} roughness={0.5} />
       </RoundedBox>
+      <RoundedBox args={[0.2, 0.22, 0.16]} radius={0.02} position={[-0.06, 0.02, 0]}>
+        <meshStandardMaterial {...mat('#475569')} metalness={0.25} roughness={0.55} />
+      </RoundedBox>
+      <RoundedBox args={[0.16, 0.18, 0.14]} radius={0.02} position={[0.1, 0.01, 0]}>
+        <meshStandardMaterial {...mat('#64748b')} metalness={0.25} roughness={0.55} />
+      </RoundedBox>
+      <mesh position={[0, 0.2, 0]}>
+        <cylinderGeometry args={[0.04, 0.06, 0.12, 6]} />
+        <meshStandardMaterial {...mat('#475569')} />
+      </mesh>
     </group>
   );
 }
 
-// ——— MULTIMODAL: Four modality nodes around a central hub ———
+// ——— MULTIMODAL: Iconscout text-to-audio (document + sound waves) ———
 function MultimodalLogo() {
   const group = useRef(null);
-  const nodes = useRef([]);
-  const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#22c55e'];
+  const doc = useRef(null);
+  const waves = useRef([]);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    if (group.current) group.current.rotation.y = t * 0.3;
-    nodes.current.forEach((mesh, i) => {
-      if (mesh) {
-        const pulse = 1 + Math.sin(t * 2 + i * 1.5) * 0.12;
-        mesh.scale.setScalar(pulse);
-      }
+    if (group.current) group.current.rotation.y = t * 0.35;
+    if (doc.current) doc.current.position.y = Math.sin(t * 1) * 0.02;
+    waves.current.forEach((mesh, i) => {
+      if (mesh) mesh.scale.y = 0.9 + 0.25 * Math.sin(t * 2 + i * 0.6);
     });
   });
-  const radius = 0.28;
+  const waveHeights = [0.14, 0.22, 0.18, 0.26, 0.2];
   return (
     <group ref={group} scale={1.0}>
-      {[0, 1, 2, 3].map((i) => {
-        const angle = (i / 4) * Math.PI * 2;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        return (
-          <mesh key={i} position={[x, 0, z]} ref={(el) => (nodes.current[i] = el)}>
-            <sphereGeometry args={[0.09, 20, 20]} />
-            <meshStandardMaterial {...mat(colors[i], colors[i], 0.3)} metalness={0.25} roughness={0.4} />
-          </mesh>
-        );
-      })}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[0.07, 20, 20]} />
-        <meshStandardMaterial {...mat('#6366f1', '#6366f1', 0.25)} metalness={0.3} roughness={0.4} />
+      <group ref={doc}>
+        <RoundedBox args={[0.3, 0.22, 0.04]} radius={0.02} position={[-0.08, 0, -0.02]}>
+          <meshStandardMaterial {...mat('#f8fafc')} roughness={0.6} />
+        </RoundedBox>
+        <RoundedBox args={[0.2, 0.02, 0.02]} radius={0.01} position={[-0.08, 0.05, 0.01]} />
+        <RoundedBox args={[0.24, 0.02, 0.02]} radius={0.01} position={[-0.08, 0.02, 0.01]} />
+        <RoundedBox args={[0.18, 0.02, 0.02]} radius={0.01} position={[-0.08, -0.01, 0.01]} />
+      </group>
+      {waveHeights.map((h, i) => (
+        <mesh
+          key={i}
+          ref={(el) => (waves.current[i] = el)}
+          position={[0.12 + i * 0.06, -0.02 + h / 2, 0.02]}
+          scale={[1, 1, 1]}
+        >
+          <RoundedBox args={[0.04, h, 0.03]} radius={0.015} />
+          <meshStandardMaterial {...mat('#8b5cf6', '#a78bfa', 0.3)} metalness={0.2} roughness={0.45} />
+        </mesh>
+      ))}
+      <mesh position={[0.2, 0.08, 0.02]}>
+        <sphereGeometry args={[0.04, 12, 12]} />
+        <meshStandardMaterial {...mat('#06b6d4', '#22d3ee', 0.4)} />
       </mesh>
     </group>
   );
